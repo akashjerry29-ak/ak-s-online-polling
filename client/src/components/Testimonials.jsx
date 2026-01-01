@@ -1,7 +1,7 @@
 import React from 'react';
 
-export default function Testimonials({ feedbacks = [] }) { // Accept feedbacks as prop
-  // Fallback if no real data yet
+export default function Testimonials({ feedbacks = [], loading = false }) {
+  // Fallback reviews if no real data
   const defaultReviews = [
     { name: "Alex Johnson", message: "Fastest way to get feedback during my live events!", rating: 5 },
     { name: "Sarah Miller", message: "The real-time updates are incredibly smooth.", rating: 5 },
@@ -14,7 +14,7 @@ export default function Testimonials({ feedbacks = [] }) { // Accept feedbacks a
     return [...Array(5)].map((_, i) => (
       <svg
         key={i}
-        className={`w-6 h-6 ${i < rating ? 'text-yellow-400' : 'text-gray-300'} drop-shadow`}
+        className={`w-7 h-7 ${i < rating ? 'text-yellow-400' : 'text-gray-300'} drop-shadow-md transition`}
         fill="currentColor"
         viewBox="0 0 20 20"
       >
@@ -26,38 +26,44 @@ export default function Testimonials({ feedbacks = [] }) { // Accept feedbacks a
   return (
     <section id="testimonials" className="py-20 bg-gradient-to-b from-gray-50 to-white">
       <div className="container mx-auto px-6">
-        
+        <h2 className="text-4xl md:text-5xl font-extrabold text-center mb-16 text-gray-800">
+          What Users Say
+        </h2>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-10 max-w-6xl mx-auto">
-          {reviewsToShow.map((review, i) => (
-            <div
-              key={i}
-              className="bg-white p-10 rounded-3xl shadow-2xl hover:shadow-3xl transition-all duration-500 hover:-translate-y-4 border border-gray-100"
-            >
-              {/* Star Rating */}
-              <div className="flex justify-center mb-6">
-                {renderStars(review.rating || 5)}
-              </div>
+        {loading ? (
+          <p className="text-center text-xl text-gray-600">Loading reviews...</p>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-10 max-w-6xl mx-auto">
+            {reviewsToShow.map((review) => (
+              <div
+                key={review._id || review.name}  // ← Fixed warning: unique key
+                className="bg-white p-10 rounded-3xl shadow-2xl hover:shadow-3xl transition-all duration-500 hover:-translate-y-4 border border-gray-100"
+              >
+                {/* Stars */}
+                <div className="flex justify-center mb-6">
+                  {renderStars(review.rating || 5)}
+                </div>
 
-              {/* Quote */}
-              <p className="text-lg italic text-gray-700 leading-relaxed mb-8 text-center">
-                "{review.message || review.text}"
-              </p>
-
-              {/* Name */}
-              <h4 className="text-xl font-bold text-center text-cyan-600">
-                - {review.name}
-              </h4>
-
-              {/* Date if available */}
-              {review.createdAt && (
-                <p className="text-sm text-gray-500 text-center mt-3">
-                  {new Date(review.createdAt).toLocaleDateString()}
+                {/* Message */}
+                <p className="text-lg italic text-gray-700 leading-relaxed mb-8 text-center">
+                  "{review.message}"
                 </p>
-              )}
-            </div>
-          ))}
-        </div>
+
+                {/* Name */}
+                <h4 className="text-xl font-bold text-center text-cyan-600">
+                  - {review.name}
+                </h4>
+
+                {/* Date (only for real feedback) */}
+                {review.createdAt && (
+                  <p className="text-sm text-gray-500 text-center mt-3">
+                    {new Date(review.createdAt).toLocaleDateString()}
+                  </p>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
       </div>
     </section>
   );
